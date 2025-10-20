@@ -1,0 +1,340 @@
+{% extends "core/base.html" %}
+{% block content %}
+<body class="app">   	
+    <div class="app-wrapper">
+	    <div class="app-content pt-3 p-md-3 p-lg-4">
+		    <div class="container-xl">
+			    
+			    <div class="row g-3 mb-4 align-items-center justify-content-between">
+				    <div class="col-auto">
+			            <h1 class="app-page-title mb-0">Members</h1>
+				    </div>
+				    <div class="col-auto">
+					     <div class="page-utilities">
+						    <div class="row g-2 justify-content-start justify-content-md-end align-items-center ">
+							    <div class="col-auto">
+								    <form class="table-search-form row gx-1 align-items-center" method="GET" action="{% url 'member_search' %}">
+					                    <div class="col-auto">
+					                        <input type="text" id="search-orders" class="form-control search-orders" placeholder="Search Member" name="q" value="{{ query }}">
+					                    </div>
+					                    <div class="col-auto">
+					                        <button type="submit" class="btn app-btn-secondary">Search</button>
+					                    </div>
+					                </form>
+					                
+							    </div><!--//col-->
+
+							    <div class="col-auto">						    
+								    <a class="btn app-btn-secondary" href="{% url "add_member" %}">
+									    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+									fill="currentColor" class="bi bi-people" viewBox="0 0 16 16">
+									<path
+										d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1zm-7.978-1L7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002-.014.002zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4m3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0M6.936 9.28a6 6 0 0 0-1.23-.247A7 7 0 0 0 5 9c-4 0-5 3-5 4q0 1 1 1h4.216A2.24 2.24 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816M4.92 10A5.5 5.5 0 0 0 4 13H1c0-.26.164-1.03.76-1.724.545-.636 1.492-1.256 3.16-1.275ZM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0m3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4" />
+								</svg>
+									    Add Member
+									</a>
+							    </div>
+						    </div><!--//row-->
+					    </div><!--//table-utilities-->
+				    </div><!--//col-auto-->
+			    </div><!--//row--> 
+				<div class="mb-4">
+					<form method="get" action="{% url 'member_filter' %}">
+						<div class="row">
+							<div class="col-auto">
+								<h4 >By Time</h4>
+								<select class="form-select w-auto" name="time_filter" onchange="this.form.submit()">
+									<option value="all" {% if time_filter == 'all' %}selected{% endif %}>All</option>
+									<option value="this_month" {% if time_filter == 'this_month' %}selected{% endif %}>This month</option>
+									<option value="last_3_months" {% if time_filter == 'last_3_months' %}selected{% endif %}>Last 3 months</option>
+									<option value="last_6_months" {% if time_filter == 'last_6_months' %}selected{% endif %}>Last 6 months</option>
+								</select>
+							</div>
+							<div class="col-auto">
+								<h4>By Package</h4>
+								<select class="form-select w-auto" name="package_filter" onchange="this.form.submit()">
+									<option value="option-1" {% if package_filter == 'option-1' %}selected{% endif %}>All</option>
+									<option value="option-2" {% if package_filter == 'option-2' %}selected{% endif %}>Complete package</option>
+									<option value="option-3" {% if package_filter == 'option-3' %}selected{% endif %}>GYM + cardio</option>
+									<option value="option-4" {% if package_filter == 'option-4' %}selected{% endif %}>Cardio</option>
+								</select>
+							</div>
+						</div>
+					</form>
+				</div>	
+			    <nav id="orders-table-tab" class="orders-table-tab app-nav-tabs nav shadow-sm flex-column flex-sm-row mb-4 table-tab">
+				    <a class="flex-sm-fill text-sm-center nav-link active table-tab" id="orders-all-tab  " data-bs-toggle="tab" href="#orders-all" role="tab" aria-controls="orders-all" aria-selected="true">All</a>
+				    <a class="flex-sm-fill text-sm-center nav-link table-tab"  id="orders-paid-tab " data-bs-toggle="tab" href="#orders-paid" role="tab" aria-controls="orders-paid" aria-selected="false">Paid</a>
+				    <a class="flex-sm-fill text-sm-center nav-link table-tab" id="orders-pending-tab" data-bs-toggle="tab" href="#orders-pending" role="tab" aria-controls="orders-pending" aria-selected="false">Pending</a>
+				    <a class="flex-sm-fill text-sm-center nav-link table-tab" id="orders-cancelled-tab" data-bs-toggle="tab" href="#orders-cancelled" role="tab" aria-controls="orders-cancelled" aria-selected="false">Inactive</a>
+				</nav>
+				
+				<div class="tab-content " id="orders-table-tab-content ">
+			        <div class="tab-pane fade show active " id="orders-all" role="tabpanel" aria-labelledby="orders-all-tab">
+					    <div class="app-card app-card-orders-table shadow-sm mb-5 table-color">
+						    <div class="app-card-body table-color ">
+							    <div class="table-responsive table-color">
+							        <table class="table app-table-hover mb-0 text-left ">
+										<thead>
+											<tr>
+												<th class="cell">M_Id</th>
+												<th class="cell">Member Name</th>
+												<th class="cell">Package</th>
+												<th class="cell">Trainer</th>
+												<th class="cell">Subscription Ends</th>
+												<th class="cell">Duration</th>
+												<th class="cell"></th>
+											</tr>
+										</thead>
+										<tbody>
+											{% for m in member %}
+											<tr>
+												<td class="cell">{{m.gym_member_id}}</td>
+												<td class="cell"><a href="{% url 'member_profile' m.id %}" class="truncate">{{ m.first_name }} {{ m.last_name }}</a></td>												  
+												<td class="cell">{{m.package_name}}</td>
+												<td class="cell">{{m.trainer}}</td>
+												<td class="cell">{{ m.calculated_end_date }}</td>
+												<td class="cell">
+													{% if m.duration_months == 12 %}
+														1 year
+													{% else %}
+														{{ m.duration_months }} month{{ m.duration_months|pluralize }}
+													{% endif %}
+												</td>
+											</tr>
+											{% endfor %}									
+										</tbody>
+									</table>
+						        </div><!--//table-responsive-->  
+						    </div><!--//app-card-body-->		
+						</div><!--//app-card-->
+						<nav class="app-pagination">
+							<div class="pagination">
+								<span class="page-links">
+									{% if page_obj_all.has_previous %}
+										<a href="?page_all=1">&laquo; first</a>
+										<a href="?page_all={{ page_obj_all.previous_page_number }}">previous</a>
+									{% endif %}
+						
+									<span class="current">
+										Page {{ page_obj_all.number }} of {{ page_obj_all.paginator.num_pages }}.
+									</span>
+						
+									{% if page_obj_all.has_next %}
+										<a href="?page_all={{ page_obj_all.next_page_number }}">next</a>
+										<a href="?page_all={{ page_obj_all.paginator.num_pages }}">last &raquo;</a>
+									{% endif %}
+								</span>
+							</div>
+						</nav>
+						
+			        </div><!--//tab-pane-->
+					<div class="tab-pane fade" id="orders-paid" role="tabpanel" aria-labelledby="orders-paid-tab">
+					    <div class="app-card app-card-orders-table mb-5 table-color">
+						    <div class="app-card-body table-color">
+							    <div class="table-responsive table-color">
+								    
+							        <table class="table mb-0 text-left">
+										<thead>
+											<tr>
+												<th class="cell">M_Id</th>
+												<th class="cell">Member Name</th>
+												<th class="cell">Package</th>
+												<th class="cell">Trainer</th>
+												<th class="cell">Subscription Ends</th>
+												<th class="cell">Duration</th>
+												<th class="cell"></th>
+											</tr>
+										</thead>
+										<tbody>
+											{% for m in paid_members %}
+											<tr>
+												<td class="cell">{{m.id}}</td>
+												<td class="cell"><a href="{% url 'member_profile' m.id %}" class="truncate">{{ m.first_name }} {{ m.last_name }}</a></td>
+												<td class="cell">{{m.package_name}}</td>
+												<td class="cell">{{m.trainer}}</td>
+												<td class="cell">{{ m.calculated_end_date }}</td>
+												<td class="cell">
+													{% if m.duration_months == 12 %}
+														1 year
+													{% else %}
+														{{ m.duration_months }} month{{ m.duration_months|pluralize }}
+													{% endif %}
+												</td>
+											</tr>
+											{% endfor %}									
+										</tbody>
+									</table>
+						        </div><!--//table-responsive-->
+						    </div><!--//app-card-body-->		
+						</div><!--//app-card-->
+						<nav class="app-pagination">
+							<div class="pagination">
+								<span class="page-links">
+									{% if page_obj_paid.has_previous %}
+										<a href="?page_paid=1&filter=value#orders-paid-tab">&laquo; first</a>
+										<a href="?page_paid={{ page_obj_paid.previous_page_number }}&filter=value#orders-paid-tab">previous</a>
+									{% endif %}
+						
+									<span class="current">
+										Page {{ page_obj_paid.number }} of {{ page_obj_paid.paginator.num_pages }}.
+									</span>
+						
+									{% if page_obj_paid.has_next %}
+										<a href="?page_paid={{ page_obj_paid.next_page_number }}&filter=value#orders-paid-tab">next</a>
+										<a href="?page_paid={{ page_obj_paid.paginator.num_pages }}&filter=value#orders-paid-tab">last &raquo;</a>
+									{% endif %}
+								</span>
+							</div>
+						</nav>
+						
+			        </div><!--//tab-pane-->
+			        
+			        <div class="tab-pane fade" id="orders-pending" role="tabpanel" aria-labelledby="orders-pending-tab">
+					    <div class="app-card app-card-orders-table mb-5 table-color">
+						    <div class="app-card-body table-color">
+							    <div class="table-responsive table-color">
+							        <table class="table mb-0 text-left">
+										<thead>
+											<tr>
+												<th class="cell">M_Id</th>
+												<th class="cell">Member Name</th>
+												<th class="cell">Package</th>
+												<th class="cell">Trainer</th>
+												<th class="cell">Subscription Ends</th>
+												<th class="cell">Duration</th>
+												<th class="cell">Balanced Fees</th>
+												<th class="cell">Total Fees</th>
+												<th class="cell"></th>
+											</tr>
+										</thead>
+										<tbody>
+											{% for m in pending_members %}
+											<tr>
+												<td class="cell">{{m.id}}</td>
+												<td class="cell"><a href="{% url 'member_profile' m.id %}" class="truncate">{{ m.first_name }} {{ m.last_name }}</a></td>
+												<td class="cell">{{m.package_name}}</td>
+												<td class="cell">{{m.trainer}}</td>
+												<td class="cell">{{ m.calculated_end_date }}</td>
+												<td class="cell">
+													{% if m.duration_months == 12 %}
+														1 year
+													{% else %}
+														{{ m.duration_months }} month{{ m.duration_months|pluralize }}
+													{% endif %}
+												</td>
+												<td class="cell">{{ m.balance_fees }}</td>
+												<td class="cell">{{ m.total_fees }}</td>
+											</tr>
+											{% endfor %}									
+										</tbody>
+									</table>
+						        </div><!--//table-responsive-->
+						    </div><!--//app-card-body-->		
+						</div><!--//app-card-->
+						<nav class="app-pagination">
+							<div class="pagination">
+								<span class="page-links">
+									{% if page_obj_pending.has_previous %}
+										<a href="?page_pending=1&filter=value#orders-pending-tab">&laquo; first</a>
+										<a href="?page_pending={{ page_obj_pending.previous_page_number }}&filter=value#orders-pending-tab">previous</a>
+									{% endif %}
+						
+									<span class="current">
+										Page {{ page_obj_pending.number }} of {{ page_obj_pending.paginator.num_pages }}.
+									</span>
+						
+									{% if page_obj_pending.has_next %}
+										<a href="?page_pending={{ page_obj_pending.next_page_number }}&filter=value#orders-pending-tab">next</a>
+										<a href="?page_pending={{ page_obj_pending.paginator.num_pages }}&filter=value#orders-pending-tab">last &raquo;</a>
+									{% endif %}
+								</span>
+							</div>
+						</nav>
+						
+			        </div><!--//tab-pane-->
+			        <div class="tab-pane fade" id="orders-cancelled" role="tabpanel" aria-labelledby="orders-cancelled-tab">
+					    <div class="app-card app-card-orders-table mb-5 table-color">
+						    <div class="app-card-body table-color">
+							    <div class="table-responsive table-color">
+							        <table class="table mb-0 text-left">
+										<thead>
+											<tr>
+												<th class="cell">M_Id</th>
+												<th class="cell">Member Name</th>
+												<th class="cell">Package</th>
+												<th class="cell">Trainer</th>
+												<th class="cell">Join Date</th>
+												<th class="cell">Subscription Ends</th>
+												<th class="cell"></th>
+											</tr>
+										</thead>
+										<tbody>
+											{% for m in cancelled_members %}
+											<tr>
+												<td class="cell">{{m.id}}</td>
+												<td class="cell"><a href="{% url 'member_profile' m.id %}" class="truncate">{{ m.first_name }} {{ m.last_name }}</a></td>
+												<td class="cell">{{m.package_name}}</td>
+												<td class="cell">{{m.trainer}}</td>
+												<td class="cell"><span>{{m.join_date}}</span></td>
+												<td class="cell">{{ m.calculated_end_date }}</td>
+											</tr>
+											{% endfor %}									
+										</tbody>
+									</table>
+						        </div><!--//table-responsive-->
+						    </div><!--//app-card-body-->		
+						</div><!--//app-card-->
+						<nav class="app-pagination">
+							<div class="pagination">
+								<span class="page-links">
+									{% if page_obj_cancelled.has_previous %}
+										<a href="?page_cancelled=1&filter=value#orders-cancelled-tab">&laquo; first</a>
+										<a href="?page_cancelled={{ page_obj_cancelled.previous_page_number }}&filter=value#orders-cancelled-tab">previous</a>
+									{% endif %}
+						
+									<span class="current">
+										Page {{ page_obj_cancelled.number }} of {{ page_obj_cancelled.paginator.num_pages }}.
+									</span>
+						
+									{% if page_obj_cancelled.has_next %}
+										<a href="?page_cancelled={{ page_obj_cancelled.next_page_number }}&filter=value#orders-cancelled-tab">next</a>
+										<a href="?page_cancelled={{ page_obj_cancelled.paginator.num_pages }}&filter=value#orders-cancelled-tab">last &raquo;</a>
+									{% endif %}
+								</span>
+							</div>
+						</nav>						
+			        </div><!--//tab-pane-->
+				</div><!--//tab-content-->   
+		    </div><!--//container-fluid-->
+	    </div><!--//app-content-->
+	    
+	    <footer class="app-footer">
+		    <div class="container text-center py-3">
+		         <!--/* This template is free as long as you keep the footer attribution link. If you'd like to use the template without the attribution link, you can buy the commercial license via our website: themes.3rdwavemedia.com Thank you for your support. :) */-->
+            
+		       
+		    </div>
+	    </footer><!--//app-footer-->
+	    
+    </div><!--//app-wrapper-->    					
+
+	<script>
+		document.addEventListener("DOMContentLoaded", function() {
+			var hash = window.location.hash;
+			if (hash) {
+				var activeTab = document.querySelector(hash);
+				if (activeTab) {
+					// Logic to activate the tab
+					// For example, using Bootstrap's tab method:
+					var tab = new bootstrap.Tab(activeTab);
+					tab.show();
+				}
+			}
+		});
+		
+	</script>
+
+</body>
+
+{% endblock content %}

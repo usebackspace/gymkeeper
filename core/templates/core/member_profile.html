@@ -1,0 +1,69 @@
+{% extends "core/base.html" %}
+{% block content %}
+
+<body class="app">   	
+<div class="app-wrapper">
+    <div class="app-content pt-3 p-md-3 p-lg-4">
+        <div class="container-xl">
+            <h1 class="app-page-title">Member Profile</h1>
+
+            <div class="row gy-4">
+                <div class="col-12 col-lg-6">
+                    <div class="app-card app-card-account shadow-sm d-flex flex-column align-items-start">
+                        <div class="app-card-header p-3 border-bottom-0">
+                            <div class="row align-items-center gx-3">
+                                <div class="col-auto">
+                                    <div class="app-icon-holder">
+                                        <i class="bi bi-person"></i>
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <h4 class="app-card-title">Profile</h4>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="app-card-body px-4 w-100">
+                            <form method="POST" enctype="multipart/form-data">
+                                {% csrf_token %}
+
+                                <div class="mb-3 text-center">
+                                    <img src="{% if member.photo %}{{ member.photo.url }}{% else %}{{ MEDIA_URL }}photos/default_user.png{% endif %}" 
+                                         class="rounded-circle img-thumbnail" width="150" height="150" alt="Profile Photo">
+                                    {{ form.photo }}
+                                </div>
+
+                                {% for field in form %}
+                                    <div class="mb-3">
+                                        <label class="form-label"><strong>{{ field.label }}</strong></label>
+                                        {{ field }}
+                                        {% if field.help_text %}
+                                            <small class="form-text text-muted">{{ field.help_text }}</small>
+                                        {% endif %}
+                                        {% for error in field.errors %}
+                                            <div class="text-danger">{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endfor %}
+
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                            </form>
+                        </div>
+
+                        <div class="app-card-footer p-4 mt-auto">
+                            <a class="btn app-btn-secondary" href="{% url 'member' %}">← Back to Members</a>
+                        </div>
+                    </div>
+                </div>
+            </div><!--//row-->
+        </div>
+    </div>
+
+    <footer class="app-footer">
+        <div class="container text-center py-3">
+       
+        </div>
+    </footer>
+</div>
+
+{% endblock %}

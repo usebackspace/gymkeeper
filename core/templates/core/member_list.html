@@ -1,0 +1,98 @@
+{# members/member_list.html #}
+{% extends "core/base.html" %}
+{% load static %}
+{% load humanize %} {# If you use intcomma or other humanize filters here #}
+
+{% block title %}Member List{% endblock %}
+
+{% block content %}
+<div class="app-wrapper">
+    <div class="app-content pt-3 p-md-3 p-lg-4">
+        <div class="container-xl">
+            <h1 class="app-page-title">
+                Member List
+                {% if package_filter %}
+                    <span class="badge bg-primary">Package: {{ package_filter|lower|capfirst }}</span> {# Or use a custom filter for better display name #}
+                {% elif active_filter %}
+                    <span class="badge bg-success">Active Members</span>
+                {% endif %}
+            </h1>
+
+            <div class="app-card app-card-stats shadow-sm mb-4">
+                <div class="app-card-body p-3 p-lg-4">
+                    <div class="table-responsive">
+                        <table class="table app-table-hover mb-0 text-left">
+                            <thead>
+                                <tr>
+                                    <th class="cell">Name</th>
+                                    <th class="cell">Email</th>
+                                    <th class="cell">Phone</th>
+                                    <th class="cell">Package</th>
+                                    <th class="cell">Join Date</th>
+                                    <th class="cell">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for member in page_obj %}
+                                <tr>
+                                    <td class="cell">{{ member.first_name }} {{ member.last_name }}</td>
+                                    <td class="cell">{{ member.email }}</td>
+                                    <td class="cell">{{ member.phone_number }}</td>
+                                    <td class="cell">
+                                        {# Use get_package_name_display to show 'Gym Only' instead of 'GYM' if you defined choices #}
+                                        {{ member.get_package_name_display }}
+                                    </td>
+                                    <td class="cell">{{ member.join_date|date:"M d, Y" }}</td>
+                                    <td class="cell">
+                                        {% if member.active_member %}
+                                            <span class="badge bg-success">Active</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Inactive</span>
+                                        {% endif %}
+                                    </td>
+                                    
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="7" class="text-center">No members found {% if package_filter %} for {{ package_filter|lower|capfirst }} package{% elif active_filter %} (Active Members){% endif %}.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>{# --- Pagination with filter preservation --- #}
+                    {% if page_obj.has_other_pages %}
+                    <nav class="app-pagination mt-4">
+                        <ul class="pagination justify-content-center">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if package_filter %}&package={{ package_filter }}{% endif %}{% if active_filter %}&active={{ active_filter }}{% endif %}">Previous</a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled"><span class="page-link">Previous</span></li>
+                            {% endif %}
+
+                            {% for i in page_obj.paginator.page_range %}
+                                {% if page_obj.number == i %}
+                                    <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+                                {% else %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ i }}{% if package_filter %}&package={{ package_filter }}{% endif %}{% if active_filter %}&active={{ active_filter }}{% endif %}">{{ i }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if package_filter %}&package={{ package_filter }}{% endif %}{% if active_filter %}&active={{ active_filter }}{% endif %}">Next</a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled"><span class="page-link">Next</span></li>
+                            {% endif %}
+                        </ul>
+                    </nav>{% endif %}
+
+                </div></div></div></div><footer class="app-footer">
+        <div class="container text-center py-3">
+            
+        </div>
+    </footer></div>{% endblock content %}

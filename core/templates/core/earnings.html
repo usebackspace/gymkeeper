@@ -1,0 +1,224 @@
+{% extends "core/base.html" %}
+{% load static %}
+{% load humanize %} 
+
+{% block title %}Earnings Overview{% endblock %}
+
+{% block css %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .chart-container {
+            position: relative;
+            margin: auto;
+            height: 350px;
+            width: 80%;
+            margin-bottom: 30px;
+        }
+
+        .pie-chart-container {
+            position: relative;
+            margin: auto;
+            height: 350px;
+            width: 80%;
+            margin-bottom: 30px;
+        }
+
+        .equal-height {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        @media (max-width: 768px) {
+            .chart-container, .pie-chart-container {
+                width: 95%;
+                height: 300px;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="app-wrapper">
+        <div class="app-content pt-3 p-md-3 p-lg-4">
+            <div class="container-xl">
+                <br>
+                <h2 class="mb-4 ">Earnings Overview</h2>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header overall-earning text-white">
+                                <h5 class="mb-0  text-white">Overall Total Earnings</h5>
+                            </div>
+                            <div class="card-body text-center">
+                                <h3 class="card-title display-4 fw-bold">₹ {{ total_earning }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <div class="card shadow-sm equal-height">
+                            <div class="card-header bg-info text-white">
+                                <h5 class="mb-0">Earnings by Time Period</h5>
+                            </div>
+                            <div class="card-body d-flex justify-content-center align-items-center">
+                                <div class="chart-container">
+                                    <canvas id="earningsBarChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-4">
+                        <div class="card shadow-sm equal-height">
+                            <div class="card-header bg-warning text-dark">
+                                <h5 class="mb-0">Earnings by Package Type</h5>
+                            </div>
+                            <div class="card-body d-flex justify-content-center align-items-center">
+                                <div class="pie-chart-container">
+                                    <canvas id="packageEarningsDoughnutChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <p class="mt-4 text-muted text-center">All earnings are based on 'Paid Fees' from member subscriptions.</p>
+            </div>
+        </div>
+        <footer class="app-footer">
+            <div class="container text-center py-3"></div>
+        </footer>
+    </div>
+
+    <script>
+        const weeklyData = {{ weekly_earning_chart|safe }};
+        const monthlyData = {{ monthly_earning_chart|safe }};
+        const threeMonthsData = {{ three_months_earning_chart|safe }};
+        const sixMonthsData = {{ six_months_earning_chart|safe }};
+        const yearlyData = {{ yearly_earning_chart|safe }};
+
+        const ctxBar = document.getElementById('earningsBarChart').getContext('2d');
+        new Chart(ctxBar, {
+            type: 'bar',
+            data: {
+                labels: ['Last 7 Days', 'Current Month', 'Last 3 Months', 'Last 6 Months', 'Last 1 Year'],
+                datasets: [{
+                    label: 'Earnings (₹)',
+                    data: [weeklyData, monthlyData, threeMonthsData, sixMonthsData, yearlyData],
+                    backgroundColor: [
+                        'rgba(75, 192, 192, 0.6)',
+                        'rgba(153, 102, 255, 0.6)',
+                        'rgba(255, 159, 64, 0.6)',
+                        'rgba(255, 99, 132, 0.6)',
+                        'rgba(54, 162, 235, 0.6)'
+                    ],
+                    borderColor: [
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)',
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Amount (₹)'
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return '₹' + value.toLocaleString('en-IN');
+                            }
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Time Period'
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += '₹' + context.parsed.y.toLocaleString('en-IN');
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        const completePackageData = {{ complete_package_earning_chart|safe }};
+        const gymPackageData = {{ gym_package_earning_chart|safe }};
+        const gymCardioPackageData = {{ gym_cardio_package_earning_chart|safe }};
+        const cardioPackageData = {{ cardio_package_earning_chart|safe }};
+
+        const ctxDoughnut = document.getElementById('packageEarningsDoughnutChart').getContext('2d');
+        new Chart(ctxDoughnut, {
+            type: 'doughnut',
+            data: {
+                labels: ['Complete Package', 'Gym Only', 'Gym + Cardio', 'Cardio Only'],
+                datasets: [{
+                    label: 'Earnings (₹)',
+                    data: [completePackageData, gymPackageData, gymCardioPackageData, cardioPackageData],
+                    backgroundColor: [
+                        'rgba(243, 42, 85, 0.7)',
+                        'rgba(14, 144, 231, 0.7)',
+                        'rgba(255, 206, 86, 0.7)',
+                        'rgba(83, 190, 11, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(243, 42, 85, 0.7)',
+                        'rgba(14, 144, 231, 0.7)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(83, 190, 11, 0.7)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed !== null) {
+                                    label += '₹' + context.parsed.toLocaleString('en-IN');
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+{% endblock content %}

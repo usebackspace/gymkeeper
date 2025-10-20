@@ -1,0 +1,31 @@
+/* ======= Member Photo ======== */
+.member-photo {
+    width: 100%;
+    /* Full width of the container */
+    height: 100px;
+    /* Fixed height */
+    object-fit: cover;
+    /* Crop and cover container nicely */
+    border-radius: 0.25rem;
+    /* Rounded corners to match bootstrap rounded class */
+}
+
+/* ======= End Member Photo ======== */
+
+/* =================== Form ================== */
+label {
+    font-weight: bold;
+}
+
+.profile-background {
+    background-color: #fff5f7 !important;
+}
+
+/* ======================================== */
+
+/* ============ Earning =============== */
+.overall-earning{
+    background-color: #d8092c;
+}
+
+/* ==================================== */
