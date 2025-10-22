@@ -6,7 +6,7 @@ cryptography==45.0.4
 Django==5.2.3
 django-allauth==65.9.0
 idna==3.10
-mysqlclient==2.2.7
+whitenoise==6.11.0
 pillow==11.2.1
 pycparser==2.22
 PyJWT==2.10.1
